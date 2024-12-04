@@ -1,19 +1,47 @@
 package com.alura.literAlura.Model;
 
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Entity
+@Table(name = "livros")
 public class Livro {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true)
     private String titulo;
-    private List<Autor> autor;
+
+    @OneToMany(mappedBy = "livro", cascade = CascadeType.ALL)
+    private List<LivroAutor> livroAutores = new ArrayList<>();
+
+
+    @ElementCollection
+    @Column(name = "idioma")
     private  List<String> idioma;
+
+    @Column(name = "downloads")
     private double downloads;
+
+    public Livro(){}
 
     public Livro(DadosLivros dadosLivros){
         this.titulo = dadosLivros.titulo();
-        this.autor = dadosLivros.autor();
         this.idioma = dadosLivros.idioma();
         this.downloads = dadosLivros.numeroDeDownloads();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitulo() {
@@ -24,12 +52,12 @@ public class Livro {
         this.titulo = titulo;
     }
 
-    public List<Autor> getAutor() {
-        return autor;
+    public List<LivroAutor> getLivroAutores() {
+        return livroAutores;
     }
 
-    public void setAutor(List<Autor> autor) {
-        this.autor = autor;
+    public void setLivroAutores(List<LivroAutor> livroAutores) {
+        this.livroAutores = livroAutores;
     }
 
     public List<String> getIdioma() {
@@ -48,16 +76,17 @@ public class Livro {
         this.downloads = downloads;
     }
 
-
     @Override
     public String toString() {
-        String autores = autor.stream().map(Autor::toString).collect(Collectors.joining(", "));
+        String autores = livroAutores.stream()
+                .map(livroAutor -> livroAutor.getAutor().getNome())
+                .collect(Collectors.joining(", "));
         String idiomas = String.join(", ", idioma);
 
         return "\nLIVRO\n" +
-                "Título = " +titulo+ "\n" +
-                "Autor= " +autores+ "\n" +
-                "Idioma = " + idiomas+ "\n" +
-                "Nº de downloads = " +downloads + "\n";
+                "Título = " + titulo + "\n" +
+                "Autor= " + autores + "\n" +
+                "Idioma = " + idiomas + "\n" +
+                "Nº de downloads = " + downloads + "\n";
     }
 }
