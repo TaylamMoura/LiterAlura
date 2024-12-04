@@ -1,7 +1,10 @@
 package com.alura.literAlura.Model;
-//tabela intermediaria para conectar livro com autor
+
 
 import jakarta.persistence.*;
+
+
+//tabela intermediaria para conectar livro com autor
 
 @Entity
 public class LivroAutor {
