@@ -3,6 +3,7 @@ package com.alura.literAlura.Main;
 import com.alura.literAlura.Model.Autor;
 import com.alura.literAlura.Model.Livro;
 import com.alura.literAlura.Model.LivroAutor;
+import com.alura.literAlura.Repository.AutorRepository;
 import com.alura.literAlura.Repository.LivroRepository;
 import com.alura.literAlura.Service.ConexaoAPI;
 import com.alura.literAlura.Service.ConverteDados;
@@ -25,8 +26,14 @@ public class Principal {
     private Scanner leitura = new Scanner(System.in);
     private ConexaoAPI conexao = new ConexaoAPI();
     private ConverteDados converteDados = new ConverteDados();
+    private AutorRepository repositorio;
 
     private static final String ENDERECO = "https://gutendex.com/books?search=";
+
+    public Principal(LivroService livroService, AutorRepository repositorio) {
+        this.livroService = livroService;
+        this.repositorio = repositorio;
+    }
 
     public void menuOpcoes() {
         System.out.println(" - MENU - ");
@@ -45,18 +52,32 @@ public class Principal {
 
             int opcao = leitura.nextInt();
             leitura.nextLine();
+
             switch (opcao) {
-                case 1 -> buscarLivroAPI();
-//                case 3 -> autoresCadastrados();
-//                case 4 -> autoresVivosCadastrados();
-//                case 5 -> livrosIdioma();
-                case 2 ->
-                        listarLivrosCadastrados();
-                case 0 -> {
-                    System.out.println("saindo....");
+                case 1:
+                    buscarLivroAPI();
+                    break;
+                case 2:
+                    listarLivrosCadastrados();
+                    break;
+                case 3:
+                    autoresCadastrados();
+                    break;
+                case 4:
+                    autoresVivosEmDeterminadoAno();
+                    break;
+//                case 5:
+//                    listarLivrosPeloIdioma();
+//                    break;
+                case 0:
+                    System.out.println("Obrigado por usar nossos Serviços!");
                     return;
-                }
-                default -> System.out.println("Opção inválida.Digite novamente");
+                default:
+                    System.out.println("Opção inválida.Digite novamente");
+
+                    //                case 4 -> autoresVivosCadastrados();
+//                case 5 -> livrosIdioma();
+
             }
         }
     }
@@ -67,7 +88,7 @@ public class Principal {
         var nomeLivro = leitura.nextLine().toLowerCase();
         var url = ENDERECO + nomeLivro.replace(" ", "%20");
         var json = conexao.obterDados(url);
-        System.out.println("RESPOSTA API: "+ json); //TIRAR DEPOIS
+        System.out.println("RESPOSTA API: " + json); //TIRAR DEPOIS
 
         RespostaAPI respostaAPI = converteDados.obterDados(json, RespostaAPI.class);
 
@@ -75,7 +96,7 @@ public class Principal {
                 .stream().filter(dadosLivros -> dadosLivros.titulo().equalsIgnoreCase(nomeLivro))
                 .findFirst();
 
-        if(livroEncontrado.isPresent()){
+        if (livroEncontrado.isPresent()) {
             DadosLivros dadosLivro = livroEncontrado.get();
             Livro livro = new Livro(dadosLivro);
             // Cria a relação LivroAutor
@@ -96,57 +117,67 @@ public class Principal {
                 e.printStackTrace();
                 System.out.println("Erro ao salvar livro: " + e.getMessage());
             }
-    } else {
-        System.out.println("Livro não encontrado.");
-    }
+        } else {
+            System.out.println("Livro não encontrado.");
+        }
 
     }
 
-    private void listarLivrosCadastrados(){
+    private void listarLivrosCadastrados() {
         var livros = livroService.buscarLivrosSalvos();
         livros.forEach(System.out::println);
+    }
+    private void listarObrasDeAutor(Autor autor) {
+        autor.getObras().forEach(livro -> {
+            System.out.println(" - " + livro.getTitulo());
+        });
+    }
+
+    private void autoresCadastrados() {
+        List<Autor> autoresCadastrados = repositorio.autoresCadastrados();
+        autoresCadastrados.forEach(a -> {
+                    System.out.println("Autor(a): " + a.getNome() +
+                            "\nAno de Nascimento: " + a.getNascimento() +
+                            "\nAno de Falecimento: " + (a.getAnoFalecimento() == 0 ? "Ainda vivo" : a.getAnoFalecimento()) +
+                            "\nLivros: ");
+                    listarObrasDeAutor(a);
+                    System.out.println();
+                });
+    }
+
+    private void autoresVivosEmDeterminadoAno() {
+        System.out.println("Digite o ano desejado: ");
+        var ano = leitura.nextInt();
+        leitura.nextLine();
+        List<Autor> autoresVivos = repositorio.autoresVivosNoAno(ano);
+        autoresVivos.forEach(a -> {
+            System.out.println("Autor(a): " + a.getNome() +
+                    "\nAno de Nascimento: " + a.getNascimento() +
+                    "\nAno de Falecimento: " + (a.getAnoFalecimento() == 0 ? "Ainda vivo" : a.getAnoFalecimento()) +
+                    "\nLivros: ");
+            listarObrasDeAutor(a);
+            System.out.println();
+        });
     }
 }
 
 
-//private void buscarLivroAPI(){
-//        DadosLivros dadosLivros = getDadosLivros();
-//        Livro livro = new Livro(dadosLivros);
-//        repositorio.save(livro);
-//        System.out.println(dadosLivros);
+//    private void listarLivrosPeloIdioma() {
+//
+//        System.out.println("--> pt - português, ");
+//        System.out.println("--> es - espanhol,");
+//        System.out.println("--> en - inglês,");
+//        System.out.println("--> fr - francês. ");
+//        System.out.println("Digite a sigla do idioma desejado: ");
+//        var livroIdioma = leitura.nextLine();
+//
+//        List<Livro> idiomas = repositorio.livrosPorIdioma(livroIdioma);
+//
+//        listarLivrosCadastrados();
+////        idiomas.forEach(a -> {
+////            System.out.println(busc);
+//
+//        });
 //    }
-//
-//    private  DadosLivros getDadosLivros(){
-//        System.out.println("Digite o titulo do livro desejado: ");
-//        var nomeLivro = leitura.nextLine().toLowerCase();
-//        var json = conexao.obterDados(ENDERECO + nomeLivro.replace(" ", "%20"));
-//        //DadosLivros dados = converteDados.obterDados(json, DadosLivros.class);
-//        //return dados;
-//
-//        RespostaAPI respostaAPI = converteDados.obterDados(json, RespostaAPI.class);
-//        Optional<DadosLivros> livroEncontrado = respostaAPI.getResultados()
-//                .stream().filter(dadosLivros -> dadosLivros.titulo().equalsIgnoreCase(nomeLivro))
-//                .findFirst();
-//
-//        if (livroEncontrado.isPresent()){
-//            Livro livro = new Livro(livroEncontrado.get());
-//            System.out.println(livro);
-//            try{
-//                livroService.salvarLivro(livro);
-//                System.out.println("\nLivro salvo no bd"); //tirar depois
-//            } catch (Exception e ){
-//                e.printStackTrace();
-//                System.out.println("erro ao salvar " + e.getMessage());
-//            }
-//
-//        } else{
-//            System.out.println("Livro não encontrado.");
-//        }
-//    }
-//    private void listarLivrosCadastrados(){
-//        livros = repositorio.findAll();
-//        livros.stream().sorted(Comparator.comparing(Livro::getTitulo))
-//                .forEach(System.out::println);
-//
-//    }
-//
+
+//}
