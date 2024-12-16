@@ -48,7 +48,6 @@ public class LivroService {
             livroAutor.setLivro(livroSalvo);
             livroAutorRepository.save(livroAutor);
         }
-
         return livroSalvo;
     }
 
