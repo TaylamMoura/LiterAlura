@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "autores")
@@ -27,7 +28,10 @@ public class Autor {
     @Column(name = "ano_falecimento")
     private int anoFalecimento;
 
-    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL)
+//    @Transient
+//    private List<Livro> obras;
+
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<LivroAutor> livroAutores;
 
     public Autor(){}
@@ -72,8 +76,15 @@ public class Autor {
         this.livroAutores = livroAutores;
     }
 
+
+    public List<Livro> getObras() {
+        return livroAutores.stream()
+                .map(LivroAutor::getLivro)
+                .collect(Collectors.toList());
+    }
+
     @Override
-    public String toString(){
-        return nome;
+    public String toString() {
+        return  nome;
     }
 }
