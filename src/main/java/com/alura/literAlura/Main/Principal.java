@@ -4,7 +4,6 @@ import com.alura.literAlura.Model.Autor;
 import com.alura.literAlura.Model.Livro;
 import com.alura.literAlura.Model.LivroAutor;
 import com.alura.literAlura.Repository.AutorRepository;
-import com.alura.literAlura.Repository.LivroRepository;
 import com.alura.literAlura.Service.ConexaoAPI;
 import com.alura.literAlura.Service.ConverteDados;
 import com.alura.literAlura.Model.DadosLivros;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Component
@@ -150,14 +150,24 @@ public class Principal {
         var ano = leitura.nextInt();
         leitura.nextLine();
         List<Autor> autoresVivos = repositorio.autoresVivosNoAno(ano);
+
+        AtomicBoolean autorEncontrado = new AtomicBoolean(false);
+
         autoresVivos.forEach(a -> {
-            System.out.println("Autor(a): " + a.getNome() +
-                    "\nAno de Nascimento: " + a.getNascimento() +
-                    "\nAno de Falecimento: " + (a.getAnoFalecimento() == 0 ? "Ainda vivo" : a.getAnoFalecimento()) +
-                    "\nLivros: ");
-            listarObrasDeAutor(a);
-            System.out.println();
+            if (ano >= a.getNascimento() && (a.getAnoFalecimento() == 0 || ano <= a.getAnoFalecimento())) {
+                System.out.println("Autor(a): " + a.getNome() +
+                        "\nAno de Nascimento: " + a.getNascimento() +
+                        "\nAno de Falecimento: " + (a.getAnoFalecimento() == 0 ? "Ainda vivo" : a.getAnoFalecimento()) +
+                        "\nLivros: ");
+                listarObrasDeAutor(a);
+                System.out.println();
+                autorEncontrado.set(true);
+            }
         });
+        if (!autorEncontrado.get()) {
+            System.out.println("Não há autores cadastrados para o ano digitado!");
+         }
+
     }
 }
 
