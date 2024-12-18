@@ -28,54 +28,33 @@ public class Autor {
     @Column(name = "ano_falecimento")
     private int anoFalecimento;
 
-//    @Transient
-//    private List<Livro> obras;
 
     @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<LivroAutor> livroAutores;
 
+
     public Autor(){}
+
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getNome() {
         return nome;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
     public int getNascimento() {
         return nascimento;
-    }
-
-    public void setNascimento(int nascimento) {
-        this.nascimento = nascimento;
     }
 
     public int getAnoFalecimento() {
         return anoFalecimento;
     }
 
-    public void setAnoFalecimento(int anoFalecimento) {
-        this.anoFalecimento = anoFalecimento;
-    }
-
     public List<LivroAutor> getLivroAutores() {
         return livroAutores;
     }
-
-    public void setLivroAutores(List<LivroAutor> livroAutores) {
-        this.livroAutores = livroAutores;
-    }
-
 
     public List<Livro> getObras() {
         return livroAutores.stream()

@@ -17,18 +17,20 @@ public class Livro {
     @Column(unique = true)
     private String titulo;
 
-    @OneToMany(mappedBy = "livro", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "livro", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<LivroAutor> livroAutores = new ArrayList<>();
 
-
-    @ElementCollection
+    @ElementCollection(fetch =  FetchType.EAGER)
+    @CollectionTable(name = "livro_idioma", joinColumns = @JoinColumn(name = "livro_id"))
     @Column(name = "idioma")
     private  List<String> idioma;
 
     @Column(name = "downloads")
     private double downloads;
 
+
     public Livro(){}
+
 
     public Livro(DadosLivros dadosLivros){
         this.titulo = dadosLivros.titulo();
@@ -40,16 +42,8 @@ public class Livro {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getTitulo() {
         return titulo;
-    }
-
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
     }
 
     public List<LivroAutor> getLivroAutores() {
@@ -64,16 +58,8 @@ public class Livro {
         return idioma;
     }
 
-    public void setIdioma(List<String> idioma) {
-        this.idioma = idioma;
-    }
-
     public double getDownloads() {
         return downloads;
-    }
-
-    public void setDownloads(double downloads) {
-        this.downloads = downloads;
     }
 
     @Override
@@ -83,7 +69,8 @@ public class Livro {
                 .collect(Collectors.joining(", "));
         String idiomas = String.join(", ", idioma);
 
-        return "\nLIVRO\n" +
+        return "------------------------------" +
+                "\nLIVRO\n" +
                 "Título = " + titulo + "\n" +
                 "Autor= " + autores + "\n" +
                 "Idioma = " + idiomas + "\n" +

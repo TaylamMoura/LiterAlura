@@ -3,9 +3,6 @@ package com.alura.literAlura.Model;
 
 import jakarta.persistence.*;
 
-
-//tabela intermediaria para conectar livro com autor
-
 @Entity
 public class LivroAutor {
 
@@ -13,7 +10,7 @@ public class LivroAutor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne // indica que livroautor pertecem a um unico livro
+    @ManyToOne 
     @JoinColumn(name = "livro_id")
     private Livro livro;
 
@@ -23,10 +20,6 @@ public class LivroAutor {
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Livro getLivro() {

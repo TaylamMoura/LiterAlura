@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 @Service
 public class LivroService {
 
@@ -26,6 +27,7 @@ public class LivroService {
     @Autowired
     private LivroAutorRepository livroAutorRepository;
 
+
     @Transactional
     public Livro salvarLivro(Livro livro) {
         Optional<Livro> livroExistente = livroRepository.findByTitulo(livro.getTitulo());
@@ -36,6 +38,7 @@ public class LivroService {
         List<Autor> autores = livro.getLivroAutores().stream()
                 .map(LivroAutor::getAutor)
                 .collect(Collectors.toList());
+
         for (Autor autor : autores) {
             if (autor.getId() == null) {
                 autorRepository.save(autor);
@@ -54,12 +57,25 @@ public class LivroService {
     @Transactional(readOnly = true)
     public List<Livro> buscarLivrosSalvos() {
         List<Livro> livros = livroRepository.findAll();
-        // Inicializa todas as coleções necessárias
+
         livros.forEach(livro -> {
             livro.getLivroAutores().forEach(livroAutor -> {
                 livroAutor.getAutor().getNome();
             });
-            livro.getIdioma().size(); // Inicializa a coleção idioma
+            livro.getIdioma().size();
+        });
+        return livros;
+    }
+
+    @Transactional
+    public List<Livro> buscarLivrosPorIdioma(String idioma) {
+        List<Livro> livros = livroRepository.livrosPorIdioma(idioma);
+
+        livros.forEach(livro -> {
+            livro.getLivroAutores().forEach(livroAutor -> {
+                livroAutor.getAutor().getNome();
+            });
+            livro.getIdioma().size();
         });
         return livros;
     }

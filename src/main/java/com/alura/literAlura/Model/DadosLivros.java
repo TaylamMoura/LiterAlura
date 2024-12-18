@@ -14,4 +14,3 @@ public record DadosLivros(@JsonAlias("title") String titulo,
 
                           @JsonAlias("download_count") double numeroDeDownloads) {
 }
-//no gutendex esta "authors": "name", "birth_year", "death_year"

@@ -14,19 +14,7 @@ public class RespostaAPI {
     @JsonAlias("results")
     private List<DadosLivros> resultados;
 
-    public int getContagem() {
-        return contagem;
-    }
-
-    public void setContagem(int contagem) {
-        this.contagem = contagem;
-    }
-
     public List<DadosLivros> getResultados() {
         return resultados;
-    }
-
-    public void setResultados(List<DadosLivros> resultados) {
-        this.resultados = resultados;
     }
 }
